@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas class="shaking-box" id="shakingBox"></canvas>
+    <canvas class="shaking-box" ref="shakingBox"></canvas>
     <div class="gift-box">
       <span class="gift-ball"></span>
     </div>
@@ -16,109 +16,94 @@ export default {
     return {
       balls:[],
       count: 0,
-      limit: 10,
+      limit: 5,
       maxRadius: 40,
-      isDown: false,
       width: "300px",
       height: "100px",
-      ctx: {},
       colors: ["#D90866", "#E87E0C", "#FF0000", "#8B0CE8", "#0D68FF"]
     }
   },
   mounted(){
+    this.width = this.$refs.shakingBox.width
+    this.height = this.$refs.shakingBox.height
+
     const canvas = document.querySelector("canvas")
     const ctx = canvas.getContext("2d")
+
+    canvas.width = this.width
+    canvas.height = this.height
     
     canvas.addEventListener("contextmenu",e => {
       if(!e) e = window.event
       e.preventDefault()
       this.balls = []
     },false)
+    
+    let animate = ()=>{
+      ctx.clearRect(0, 0, this.width, this.height)
 
-    // this.width = this.$refs.canvas.width
-    // this.height = this.$refs.canvas.height
-
-    (function animate(){
-      ctx.clearRect(0,0,_this.width,_this.height)
-      if(this.count<this.limit){
+      if(this.count < this.limit){
         this.count++
-        this.balls.push(new this.Ball("300","100"))
+        let ball = this.Ball(this.random(this.width),this.random(this.height))        
+        this.balls.push(ball)
+        this.count==4?console.log(this.balls):null
       }
 
-      this.ballMove()
-      this.ballCollision()
-      this.ballDraw()
-      requestAnimationFrame(animate);
-    })()
-  },
-  methods: {
-    random: function(m){
-      return Math.floor(Math.random()*n)
-    },
-    Ball: function(x,y){
-      this.x = x
-      this.y = y
-      this.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
-      this.vy = 3 * (Math.random() + Math.random() + Math.random() - 1.5)
-      this.radius = 5
-      this.m = this.radius*0.5
-      this.color = this.colors[random(colors.length)]
-    },
-    ballDraw: function () {
-      for (let ball of this.balls){
-        // let ball = this.balls[i],
-          radius = ball.radius,
-          radgradX = ball.x - radius*0.5,
-          radgradY = ball.y - radius*0.5,
-          radgradR1 = radius*0.02,
-          radgradR2 = radius*2
-        const radgrad = ctx.createRadialGradient(radgradX,radgradY,radgradR1,radgradX,radgradY,radgradR2)
-        radgrad.addColorStop(0,"#F7F7F7")
-        radgrad.addColorStop(0.8, ball.color);
-        radgrad.addColorStop(1, ball.color);
+      //draw ball
+      for (const ball of this.balls) {
+        let radius = ball.radius,
+            radgradX = ball.x - radius*0.5,
+            radgradY = ball.y - radius*0.5,
+            radgradR1 = radius*0.02,
+            radgradR2 = radius*2
 
-        this.ctx.fillStyle = radgrad
-        this.ctx.shaowColor = "#403938"
-        this.ctx.beginPath()
-        this.ctx.arc(ball.x,ball.y,ball.radius,0,2*Math.PI,false)
-        this.ctx.shadowOffsetX = ball.radius*0.08
-        this.ctx.shadowOffsetY = ball.radius*0.08
-        this.ctx.shadowBlur = ball.radius*0.2
-        this.ctx.closePath()
-        this.ctx.fill()
+        const radgrad = ctx.createLinearGradient(radgradX, radgradY, radgradR1, radgradX, radgradY, radgradR2)        
+        radgrad.addColorStop(0, ball.color)
+        radgrad.addColorStop(0.2, "#F7F7F7")
+        radgrad.addColorStop(1, "#F7F7F7")
+
+        ctx.fillStyle = radgrad
+        ctx.shadowColor = "#403938"
+        ctx.beginPath()
+        ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false)
+        ctx.shadowOffsetX = ball.radius * 0.08
+        ctx.shadowOffsetY = ball.radius * 0.08
+        ctx.shadowBlur = ball.radius * 0.2
+        ctx.closePath()
+        ctx.fill()
       }
-    },
-    ballMove: function (ctx) {
-      for(let ball of this.balls){
+
+      //ball move
+      for(const ball of this.balls){
         // let ball = this.balls[i]
         if(ball.radius >= this.maxRadius){
           ball.x += ball.vx
           ball.y += ball.vy
           if (ball.x - ball.radius < 0 ) {
-                ball.x = ball.radius; 
-                ball.vx *= -1;
-              }
-              if (ball.x + ball.radius > this.width) {
-                ball.x = width - ball.radius; 
-                ball.vx *= -1;
-              }
-              if (ball.y - ball.radius < 0 ) {
-                ball.y = ball.radius;
-                ball.vy *= -1;
-              }
-              if (ball.y + ball.radius > this.height) {
-                ball.y = height - ball.radius;
-                ball.vy *= -1;
-              }
+            ball.x = ball.radius; 
+            ball.vx *= -1;
+          }
+          if (ball.x + ball.radius > this.width) {
+            ball.x = this.width - ball.radius; 
+            ball.vx *= -1;
+          }
+          if (ball.y - ball.radius < 0 ) {
+            ball.y = ball.radius;
+            ball.vy *= -1;
+          }
+          if (ball.y + ball.radius > this.height) {
+            ball.y = this.height - ball.radius;
+            ball.vy *= -1;
+          }
         }
       }
-    },
-    ballCollision: function (ctx) {
+
+      //ball collision
       for (var i = 0; i < this.balls.length; i++) {
         var ball1 = this.balls[i];
-        for (var j = i + 1; j < balls.length; j++) {
+        for (var j = i + 1; j < this.balls.length; j++) {
           var ball2 = this.balls[j];
-          if (ball1.radius + ball2.radius >= maxRadius * 2) {
+          if (ball1.radius + ball2.radius >= this.maxRadius * 2) {
             var dx = ball1.x - ball2.x;
             var dy = ball1.y - ball2.y;
             var dds = dx * dx + dy * dy;
@@ -157,7 +142,26 @@ export default {
             }
           }
         }
-          }
+      }
+      requestAnimationFrame(animate) 
+    }
+    animate()
+  },
+  methods: {
+    random: function(n){
+      return Math.floor(Math.random()*n)
+    },
+    Ball: function(x,y){
+      const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF"]
+      let ball = new Object
+      ball.x = x
+      ball.y = y
+      ball.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
+      ball.vy = 3*(Math.random() + Math.random() + Math.random() - 1.5)
+      ball.radius = 25
+      ball.m = ball.radius*0.5
+      ball.color = colors[this.random(colors.length)]
+      return ball
     }
   }
 }
@@ -166,9 +170,9 @@ export default {
   .shaking-box
     width 670px
     height 440px
-    margin 20px auto 20px
-    border-top-right-radius 400px
-    border-top-left-radius 400px
+    margin 20px auto
+    // border-top-right-radius 220px
+    // border-top-left-radius 220px
   .gift-box {
     position absolute
     top 638px
