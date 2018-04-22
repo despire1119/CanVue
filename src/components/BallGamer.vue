@@ -20,7 +20,7 @@ export default {
       balls:[],
       count: 0,
       limit: 6,
-      maxRadius: 25,
+      maxRadius: 28,
       colors: ["#D90866", "#E87E0C", "#FF0000", "#8B0CE8", "#0D68FF"]
     }
   },
@@ -45,7 +45,7 @@ export default {
 
       if(this.count < this.limit){
         this.count++
-        const ball = this.Ball(this.random(this.width),this.random(this.height))        
+        const ball = this.initBall(this.random(this.width),this.random(this.height))        
         this.balls.push(ball)
       }
 
@@ -85,16 +85,20 @@ export default {
     random: function(n){
       return Math.floor(Math.random()*n)
     },
-    Ball: function(x,y){
+    initBall: function(x,y){
       const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF"]
       let ball = new Object
+      //圆心坐标
       ball.x = x
       ball.y = y
+      //移动单位
       ball.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
       ball.vy = 3*(Math.random() + Math.random() + Math.random() - 1.5)
-      ball.radius = 25
+      //初始半径
+      ball.radius = 5
       ball.m = ball.radius*0.5
-      ball.color = colors[this.random(colors.length)]
+      //球体颜色
+      ball.color = colors[this.random(colors.length)]      
       return ball
     },
     ballBigger: function(){
@@ -105,46 +109,48 @@ export default {
       }
     },
     ballCollision: function(){
-      for (var i = 0; i < this.balls.length; i++) {
-        var ball1 = this.balls[i];
+      for (let i = 0; i < this.balls.length; i++) {
+        const ball1 = this.balls[i]
         for (var j = i + 1; j < this.balls.length; j++) {
-          var ball2 = this.balls[j];
+          const ball2 = this.balls[j]
           if (ball1.radius + ball2.radius >= this.maxRadius * 2) {
-            var dx = ball1.x - ball2.x;
-            var dy = ball1.y - ball2.y;
-            var dds = dx * dx + dy * dy;
-            var dm = ball1.radius + ball2.radius;
-            var dms = dm * dm;            
+            let dx = ball1.x - ball2.x,
+              dy = ball1.y - ball2.y,
+            //圆心距离
+              dds = dx * dx + dy * dy,
+            //最小距离            
+              dm = ball1.radius + ball2.radius,
+              dms = dm * dm
             if (dds < dms) {
-              var angle = Math.atan2(dy, dx);
-              var dist = Math.sqrt(dds);
-              var depth = (dist - dm) / dist;
+              let angle = Math.atan2(dy, dx),
+                dist = Math.sqrt(dds),
+                depth = (dist - dm) / dist
               
-              ball1.x -= dx * depth * 0.5;
-              ball1.y -= dy * depth * 0.5;
-              ball2.x += dx * depth * 0.5;
-              ball2.y += dy * depth * 0.5;
+              ball1.x -= dx * depth * 0.5
+              ball1.y -= dy * depth * 0.5
+              ball2.x += dx * depth * 0.5
+              ball2.y += dy * depth * 0.5
 
-              var v1 = Math.sqrt(ball1.vx * ball1.vx + ball1.vy * ball1.vy);
-              var v2 = Math.sqrt(ball2.vx * ball2.vx + ball2.vy * ball2.vy);
+              let v1 = Math.sqrt(ball1.vx * ball1.vx + ball1.vy * ball1.vy),
+                v2 = Math.sqrt(ball2.vx * ball2.vx + ball2.vy * ball2.vy),
 
-              var a1 = Math.atan2(ball1.vy, ball1.vx);
-              var a2 = Math.atan2(ball2.vy, ball2.vx);
+                a1 = Math.atan2(ball1.vy, ball1.vx),
+                a2 = Math.atan2(ball2.vy, ball2.vx),
 
-              var rvx1 = v1 * Math.cos(a1-angle);
-              var rvy1 = v1 * Math.sin(a1-angle);
-              var rvx2 = v2 * Math.cos(a2-angle);
-              var rvy2 = v2 * Math.sin(a2-angle);
+                rvx1 = v1 * Math.cos(a1-angle),
+                rvy1 = v1 * Math.sin(a1-angle),
+                rvx2 = v2 * Math.cos(a2-angle),
+                rvy2 = v2 * Math.sin(a2-angle),
 
-              var evx1 = ((ball1.m - ball2.m) * rvx1 + 2 * ball2.m * rvx2) / (ball1.m + ball2.m);
-              var evx2 = ((ball2.m - ball1.m) * rvx2 + 2 * ball1.m * rvx1) / (ball1.m + ball2.m);
-              var evy1 = rvy1;
-              var evy2 = rvy2;
+                evx1 = ((ball1.m - ball2.m) * rvx1 + 2 * ball2.m * rvx2) / (ball1.m + ball2.m),
+                evx2 = ((ball2.m - ball1.m) * rvx2 + 2 * ball1.m * rvx1) / (ball1.m + ball2.m),
+                evy1 = rvy1,
+                evy2 = rvy2
 
-              ball1.vx =  Math.cos(angle) * evx1 + Math.cos(angle + Math.PI/2) * evy1;
-              ball1.vy =  Math.sin(angle) * evx1 + Math.sin(angle + Math.PI/2) * evy1;
-              ball2.vx =  Math.cos(angle) * evx2 + Math.cos(angle + Math.PI/2) * evy2;
-              ball2.vy =  Math.sin(angle) * evx2 + Math.sin(angle + Math.PI/2) * evy2;
+              ball1.vx =  Math.cos(angle) * evx1 + Math.cos(angle + Math.PI/2) * evy1
+              ball1.vy =  Math.sin(angle) * evx1 + Math.sin(angle + Math.PI/2) * evy1
+              ball2.vx =  Math.cos(angle) * evx2 + Math.cos(angle + Math.PI/2) * evy2
+              ball2.vy =  Math.sin(angle) * evx2 + Math.sin(angle + Math.PI/2) * evy2
             }
           }
         }
@@ -156,22 +162,41 @@ export default {
         if(ball.radius >= this.maxRadius){
           ball.x += ball.vx
           ball.y += ball.vy
-          if (ball.x - ball.radius < 0 ) {
-            ball.x = ball.radius; 
-            ball.vx *= -1;
-          }
-          if (ball.x + ball.radius > this.width) {
-            ball.x = this.width - ball.radius; 
-            ball.vx *= -1;
-          }
-          if (ball.y - ball.radius < 0 ) {
-            ball.y = ball.radius;
-            ball.vy *= -1;
-          }
-          if (ball.y + ball.radius > this.height) {
-            ball.y = this.height - ball.radius;
-            ball.vy *= -1;
-          }
+          // if(ball.y > this.height/2){
+            if (ball.x - ball.radius < 0 ) {
+              ball.x = ball.radius; 
+              ball.vx *= -1
+            }
+            if (ball.x + ball.radius > this.width) {
+              ball.x = this.width - ball.radius; 
+              ball.vx *= -1
+            }
+            if (ball.y - ball.radius < 0 ) {
+              ball.y = ball.radius
+              ball.vy *= -1
+            }
+            if (ball.y + ball.radius > this.height) {
+              ball.y = this.height - ball.radius
+              ball.vy *= -1
+            }
+          // }else{
+            // const a = (this.width/2 - ball.x)*(this.width/2 - ball.x),
+            //   b = (this.height/2 - ball.y)*(this.height/2 - ball.y)
+            // if (Math.sqrt(a+b)+ball.radius > this.width/2) {
+              // if(ball.x<this.width/2){
+              //   ball.x = ball.radius
+              //   ball.y = ball.radius
+              //   ball.vx *= -1
+              //   ball.vy *= -1
+              // }else{
+              //   ball.x = this.width - ball.radius
+              //   ball.y = this.height - ball.radius
+              //   ball.vx *= -1
+              //   ball.vy *= -1
+              // }
+              // return
+            // }
+          // }
         }
       }
     }
@@ -182,6 +207,9 @@ export default {
   .shaking-box
     width 670px
     height 450px
+    border 1px solid #ddd
+    border-top-right-radius 335px
+    border-top-left-radius 335px
     margin 20px auto 0
     // border-top-right-radius 220px
     // border-top-left-radius 220px
