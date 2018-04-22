@@ -45,14 +45,14 @@
           canvas.height = height;
         }, false);
 
-        canvas.addEventListener("contextmenu", function(e) {
+        // canvas.addEventListener("contextmenu", function(e) {
 
-          if (!e) e = window.event;
+        //   if (!e) e = window.event;
 
-          e.preventDefault();
+        //   e.preventDefault();
 
-          balls = [];
-        }, false);
+        //   balls = [];
+        // }, false);
 
         canvas.addEventListener("mousedown", function(e) {
 
@@ -97,7 +97,6 @@
         }
 
         function Ball(x, y) {
-          console.log(this)
           this.x = x;
           this.y = y;
           this.vx = 3 * (Math.random() + Math.random() + Math.random() - 1.5);
@@ -250,7 +249,6 @@
             count++;
             balls.push(new Ball(random(width), random(height)));
           }
-          console.log(count)
 
           ballBigger();
           ballMove();

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <canvas class="shaking-box" ref="shakingBox"></canvas>
+    <div class="shaking-box" ref="shakingBox" id="shakingBox">
+      <canvas width="100%" height="100%"></canvas>      
+    </div>
+    <!-- <canvas class="shaking-box" ref="shakingBox"></canvas> -->
     <div class="gift-box">
       <span class="gift-ball"></span>
     </div>
@@ -16,22 +19,31 @@ export default {
     return {
       balls:[],
       count: 0,
-      limit: 5,
-      maxRadius: 40,
+      limit: 6,
+      maxRadius: 25,
       width: "300px",
       height: "100px",
       colors: ["#D90866", "#E87E0C", "#FF0000", "#8B0CE8", "#0D68FF"]
     }
   },
   mounted(){
-    this.width = this.$refs.shakingBox.width
-    this.height = this.$refs.shakingBox.height
+    this.width = this.$refs.shakingBox.offsetWidth
+    this.height = this.$refs.shakingBox.offsetHeight
 
     const canvas = document.querySelector("canvas")
     const ctx = canvas.getContext("2d")
 
     canvas.width = this.width
     canvas.height = this.height
+
+    window.addEventListener("resize", function() {
+
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      canvas.width = width;
+      canvas.height = height;
+    }, false);
     
     canvas.addEventListener("contextmenu",e => {
       if(!e) e = window.event
@@ -39,17 +51,17 @@ export default {
       this.balls = []
     },false)
     
-    let animate = ()=>{
+    let animate = () => {
       ctx.clearRect(0, 0, this.width, this.height)
 
       if(this.count < this.limit){
         this.count++
-        let ball = this.Ball(this.random(this.width),this.random(this.height))        
+        const ball = this.Ball(this.random(this.width),this.random(this.height))        
         this.balls.push(ball)
         this.count==4?console.log(this.balls):null
       }
 
-      //draw ball
+      //画个球
       for (const ball of this.balls) {
         let radius = ball.radius,
             radgradX = ball.x - radius*0.5,
@@ -57,10 +69,10 @@ export default {
             radgradR1 = radius*0.02,
             radgradR2 = radius*2
 
-        const radgrad = ctx.createLinearGradient(radgradX, radgradY, radgradR1, radgradX, radgradY, radgradR2)        
-        radgrad.addColorStop(0, ball.color)
-        radgrad.addColorStop(0.2, "#F7F7F7")
-        radgrad.addColorStop(1, "#F7F7F7")
+        const radgrad = ctx.createRadialGradient(radgradX, radgradY, radgradR1, radgradX, radgradY, radgradR2)        
+        radgrad.addColorStop(0, "#F7F7F7")
+        radgrad.addColorStop(0.8, ball.color)
+        radgrad.addColorStop(1, ball.color)
 
         ctx.fillStyle = radgrad
         ctx.shadowColor = "#403938"
@@ -73,32 +85,38 @@ export default {
         ctx.fill()
       }
 
-      //ball move
-      for(const ball of this.balls){
-        // let ball = this.balls[i]
-        if(ball.radius >= this.maxRadius){
-          ball.x += ball.vx
-          ball.y += ball.vy
-          if (ball.x - ball.radius < 0 ) {
-            ball.x = ball.radius; 
-            ball.vx *= -1;
-          }
-          if (ball.x + ball.radius > this.width) {
-            ball.x = this.width - ball.radius; 
-            ball.vx *= -1;
-          }
-          if (ball.y - ball.radius < 0 ) {
-            ball.y = ball.radius;
-            ball.vy *= -1;
-          }
-          if (ball.y + ball.radius > this.height) {
-            ball.y = this.height - ball.radius;
-            ball.vy *= -1;
-          }
+      this.ballMove()
+      this.ballBigger()
+      this.ballCollision()
+
+      requestAnimationFrame(animate)
+    }
+    animate()
+  },
+  methods: {
+    random: function(n){
+      return Math.floor(Math.random()*n)
+    },
+    Ball: function(x,y){
+      const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF"]
+      let ball = new Object
+      ball.x = x
+      ball.y = y
+      ball.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
+      ball.vy = 3*(Math.random() + Math.random() + Math.random() - 1.5)
+      ball.radius = 25
+      ball.m = ball.radius*0.5
+      ball.color = colors[this.random(colors.length)]
+      return ball
+    },
+    ballBigger: function(){
+      for (const ball of this.balls) {
+        if (ball.radius < this.maxRadius) {
+          ball.radius += 0.5;
         }
       }
-
-      //ball collision
+    },
+    ballCollision: function(){
       for (var i = 0; i < this.balls.length; i++) {
         var ball1 = this.balls[i];
         for (var j = i + 1; j < this.balls.length; j++) {
@@ -143,25 +161,31 @@ export default {
           }
         }
       }
-      requestAnimationFrame(animate) 
-    }
-    animate()
-  },
-  methods: {
-    random: function(n){
-      return Math.floor(Math.random()*n)
     },
-    Ball: function(x,y){
-      const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF"]
-      let ball = new Object
-      ball.x = x
-      ball.y = y
-      ball.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
-      ball.vy = 3*(Math.random() + Math.random() + Math.random() - 1.5)
-      ball.radius = 25
-      ball.m = ball.radius*0.5
-      ball.color = colors[this.random(colors.length)]
-      return ball
+    ballMove: function(){
+      for(const ball of this.balls){
+        // let ball = this.balls[i]
+        if(ball.radius >= this.maxRadius){
+          ball.x += ball.vx
+          ball.y += ball.vy
+          if (ball.x - ball.radius < 0 ) {
+            ball.x = ball.radius; 
+            ball.vx *= -1;
+          }
+          if (ball.x + ball.radius > this.width) {
+            ball.x = this.width - ball.radius; 
+            ball.vx *= -1;
+          }
+          if (ball.y - ball.radius < 0 ) {
+            ball.y = ball.radius;
+            ball.vy *= -1;
+          }
+          if (ball.y + ball.radius > this.height) {
+            ball.y = this.height - ball.radius;
+            ball.vy *= -1;
+          }
+        }
+      }
     }
   }
 }
@@ -169,8 +193,8 @@ export default {
 <style lang="stylus" scoped>
   .shaking-box
     width 670px
-    height 440px
-    margin 20px auto
+    height 450px
+    margin 20px auto 0
     // border-top-right-radius 220px
     // border-top-left-radius 220px
   .gift-box {
