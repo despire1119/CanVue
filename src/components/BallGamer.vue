@@ -86,16 +86,16 @@ export default {
       return Math.floor(Math.random()*n)
     },
     initBall: function(x,y){
-      const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF"]
+      const colors = ["#D90866", "#E87E0C", "#8B0CE8", "#0D68FF","#000","#d90433","#d94982"]
       let ball = new Object
       //圆心坐标
       ball.x = x
       ball.y = y
-      //移动单位
-      ball.vx = 3*(Math.random() + Math.random() + Math.random() - 1.5)
-      ball.vy = 3*(Math.random() + Math.random() + Math.random() - 1.5)
+      //移动速率
+      ball.vx = 3*(Math.random() + Math.random() + Math.random() - 0.5)
+      ball.vy = 3*(Math.random() + Math.random() + Math.random() - 0.5)
       //初始半径
-      ball.radius = 5
+      ball.radius = this.maxRadius
       ball.m = ball.radius*0.5
       //球体颜色
       ball.color = colors[this.random(colors.length)]      
@@ -179,24 +179,6 @@ export default {
               ball.y = this.height - ball.radius
               ball.vy *= -1
             }
-          // }else{
-            // const a = (this.width/2 - ball.x)*(this.width/2 - ball.x),
-            //   b = (this.height/2 - ball.y)*(this.height/2 - ball.y)
-            // if (Math.sqrt(a+b)+ball.radius > this.width/2) {
-              // if(ball.x<this.width/2){
-              //   ball.x = ball.radius
-              //   ball.y = ball.radius
-              //   ball.vx *= -1
-              //   ball.vy *= -1
-              // }else{
-              //   ball.x = this.width - ball.radius
-              //   ball.y = this.height - ball.radius
-              //   ball.vx *= -1
-              //   ball.vy *= -1
-              // }
-              // return
-            // }
-          // }
         }
       }
     }
