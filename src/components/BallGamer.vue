@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="shaking-box" ref="shakingBox" id="shakingBox">
-      <canvas width="100%" height="100%"></canvas>      
+      <canvas></canvas>      
     </div>
     <!-- <canvas class="shaking-box" ref="shakingBox"></canvas> -->
     <div class="gift-box">
@@ -21,8 +21,6 @@ export default {
       count: 0,
       limit: 6,
       maxRadius: 25,
-      width: "300px",
-      height: "100px",
       colors: ["#D90866", "#E87E0C", "#FF0000", "#8B0CE8", "#0D68FF"]
     }
   },
@@ -30,20 +28,11 @@ export default {
     this.width = this.$refs.shakingBox.offsetWidth
     this.height = this.$refs.shakingBox.offsetHeight
 
-    const canvas = document.querySelector("canvas")
-    const ctx = canvas.getContext("2d")
+    const canvas = document.querySelector("canvas"),
+      ctx = canvas.getContext("2d")
 
     canvas.width = this.width
     canvas.height = this.height
-
-    window.addEventListener("resize", function() {
-
-      width = window.innerWidth;
-      height = window.innerHeight;
-
-      canvas.width = width;
-      canvas.height = height;
-    }, false);
     
     canvas.addEventListener("contextmenu",e => {
       if(!e) e = window.event
@@ -58,16 +47,15 @@ export default {
         this.count++
         const ball = this.Ball(this.random(this.width),this.random(this.height))        
         this.balls.push(ball)
-        this.count==4?console.log(this.balls):null
       }
 
       //画个球
       for (const ball of this.balls) {
         let radius = ball.radius,
-            radgradX = ball.x - radius*0.5,
-            radgradY = ball.y - radius*0.5,
-            radgradR1 = radius*0.02,
-            radgradR2 = radius*2
+          radgradX = ball.x - radius*0.5,
+          radgradY = ball.y - radius*0.5,
+          radgradR1 = radius*0.02,
+          radgradR2 = radius*2
 
         const radgrad = ctx.createRadialGradient(radgradX, radgradY, radgradR1, radgradX, radgradY, radgradR2)        
         radgrad.addColorStop(0, "#F7F7F7")
