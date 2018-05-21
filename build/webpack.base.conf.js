@@ -8,6 +8,17 @@ function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
+const createLintingRule = () => ({
+  test: /\.(js|vue)$/,
+  loader: 'eslint-loader',
+  enforce: 'pre',
+  include: [resolve('src'), resolve('test')],
+  options: {
+    formatter: require('eslint-friendly-formatter'),
+    emitWarning: !config.dev.showEslintErrorsInOverlay
+  }
+})
+
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
@@ -21,7 +32,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', 'styl'],
+    extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
@@ -29,6 +40,7 @@ module.exports = {
   },
   module: {
     rules: [
+      ...(config.dev.useEslint ? [createLintingRule()] : []),
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -43,7 +55,7 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
-          limit: 10000, //bytes
+          limit: 10000,
           name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
       },
@@ -59,7 +71,7 @@ module.exports = {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
-          limit: 8192,
+          limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }

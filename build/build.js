@@ -11,7 +11,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const webpackConfig = require('./webpack.prod.conf')
 
-const spinner = ora('正在构建...')
+const spinner = ora('building for production...')
 spinner.start()
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
@@ -28,14 +28,14 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
     }) + '\n\n')
 
     if (stats.hasErrors()) {
-      console.log(chalk.red('构件失败\n'))
+      console.log(chalk.red('  Build failed with errors.\n'))
       process.exit(1)
     }
 
-    console.log(chalk.cyan('---------------------构建完成--------------------\n'))
+    console.log(chalk.cyan('  Build complete.\n'))
     console.log(chalk.yellow(
-      ' 同学们：构建成功的包用于运行在服务器端,\n' + 
-      '         本地打开页面将无法正常访问。\n'
+      '  Tip: built files are meant to be served over an HTTP server.\n' +
+      '  Opening index.html over file:// won\'t work.\n'
     ))
   })
 })

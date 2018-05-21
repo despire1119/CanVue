@@ -4,7 +4,6 @@ const config = require('../config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const packageConfig = require('../package.json')
 
-//根目录拼接
 exports.assetsPath = function (_path) {
   const assetsSubDirectory = process.env.NODE_ENV === 'production'
     ? config.build.assetsSubDirectory
@@ -48,9 +47,7 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
-        fallback: 'vue-style-loader',
-        //图片url路径
-        publicPath: 'https://www.huaweicdn.com/'
+        fallback: 'vue-style-loader'
       })
     } else {
       return ['vue-style-loader'].concat(loaders)

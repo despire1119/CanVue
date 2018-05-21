@@ -105,7 +105,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       name: 'app',
       async: 'vendor-async',
       children: true,
-      //模块必须被3个以上的入口共享
       minChunks: 3
     }),
 
